@@ -14,4 +14,4 @@ A client is started in a python terminal and interacts with the daemon to call t
 In PW_Class, all functions have descriptions with general information on the function, what arguments it takes,
 example of calling the function, and what the function returns. 
 
-
+This work was done for my Master thesis regarding the new telescope node for the Stellar Observation Network Group (SONG) project. It has been tested locally with both the simulator for PWI2 and on the physical telescope. 

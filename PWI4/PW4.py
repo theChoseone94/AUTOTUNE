@@ -24,8 +24,7 @@ import re
 import datetime
 import json
 from RaConverter import *
-from urllib.parse import urlencode
-
+import PWI4_config as conf
 
 class Object(object): 
     """
@@ -43,14 +42,12 @@ class PWI4():
         Returns: True
         """
         ##this is the IP address of PWI4
-        self.link="http://10.22.88.145:8220/"
+        self.link="http://%s:%i/"%(conf.NOVO_tel_com_ip,conf.NOVO_tel_com_port)
         status = requests.get(self.link+"status")
-        
-        print("The response is beneath")
-        print(status.text)
-        print("The response is above")
+    
         
         data = status.text.split('\n')
+        self.status = status.text
         self.data = data
 
         #site parameters
@@ -168,8 +165,8 @@ class PWI4():
         Returns: 
             XML-tree in one line
         """
-        
-        ALL=self.data
+        self.update()
+        ALL=self.status
         print(ALL)
         return ALL
 
@@ -216,8 +213,8 @@ class PWI4():
             reply = "The current position of the focuser is %s microns"%(self.FOC_pos)
             return reply
         else:
-            print('The focuser is not connected to PWI4. Please use .ConnectFOC() to connect the focuser to PWI2.')
-            reply = 'The focuser is not connected to PWI4. Please use .ConnectFOC() to connect the focuser to PWI2.'
+            print('The focuser is not connected to PWI4. Please use .ConnectFOC() to connect the focuser to PWI4.')
+            reply = 'The focuser is not connected to PWI4. Please use .ConnectFOC() to connect the focuser to PWI4.'
             return reply
 
     def getRotatorPos(self):
@@ -254,7 +251,7 @@ class PWI4():
         DEC = self.MNT_Dec2000
         Alt = self.MNT_Alt
         Azm = self.MNT_Azm
-        Moving = self.MNT_slewing #From the documentation, PWI recommends that I use on_target instead of moving!
+        Moving = self.MNT_slewing
         Mnt = self.MNT_connection
         Foc = self.FOC_connection
         tracking = self.MNT_tracking
@@ -379,13 +376,14 @@ class PWI4():
         IsTrackingOn = self.MNT_tracking
         if IsTrackingOn == "true":
             print("Tracking is ON.")
-            return True #IsTrackingOn
+            return True 
         else:
             print("Tracking is OFF.")
-            return False #IsTrackingOn
+            return False 
         
     def getTrackingRMSError(self):
         """
+        A function that returns the Root Mean Square (RMS) of the tracking error. 
         """
         
         self.update()
@@ -455,11 +453,11 @@ class PWI4():
         self.update()
 
         #Checks wheter the wanted position is already the current position. DOES NOT WORK FOR SOME REASON???
-        if "position" == self.FOC_pos:
+        if "%s"%(position) == self.FOC_pos:
             print('The new requested position is already the current position of the focuser. Nothing will happen.')
             return True
 
-        if "position" < "0":
+        if position < 0:
             print('The position is less than 0 microns. The movement will NOT be executed')
             return False
 
@@ -526,7 +524,7 @@ class PWI4():
             print('The focuser is already disconnected')
             return True
 
-        cmd = requests.get(self.link+"?&device=focuser&cmd=disconnect")
+        cmd = requests.get(self.link+"focuser/disable")
         self.update()
         timeout_sec = 20
         timeout = time.time() + timeout_sec
@@ -661,7 +659,7 @@ class PWI4():
     
     
         #This function starts the focuser's auto-focusing function. 
-        #However this does not work, since the function needs MAXIM-DL in PWI2
+        #However this does not work, since the function needs MAXIM-DL in PWI4
     def FocAutofocus(self):
         print('The focuser will start autofocusing - please wait')
         
@@ -962,22 +960,23 @@ class PWI4():
         # If alt is above horizon-limit, then it will proceed to track that target
         
         check = SSCA.coordinates.coordinate_check(self,RA,DEC)
-        horizon_limit = 15 #the alt-limit in degrees for the telescope to track
-        ###### PLEASE NOTE THAT PWI WILL TRACK THE TARGET TO THE LIMIT SET IN PWI2 (LOWER TRACKING LIMIT) 
+        horizon_limit = conf.NOVO_lower_limit #the alt-limit in degrees for the telescope to track
+        ###### PLEASE NOTE THAT PWI WILL TRACK THE TARGET TO THE LIMIT SET IN PWI4 (LOWER TRACKING LIMIT) 
         #I have now set it to 15 deg both here and in PWI, but if we want to change it in the future, we need to change it both places.
         if check == 0:
-            star_init = SSCA.star_pos.__init__(self,site=3) #sets the site for Mt. Kent
+            star_init = SSCA.star_pos.__init__(self,site=conf.site) #sets the site for Mt. Kent
             star_alt = SSCA.star_pos.star_alt(self,RA,DEC) #uses the SSCA script to get alt
             star_azm = SSCA.star_pos.star_az(self,RA,DEC) #uses the SSCA script to get azm
             #print('Star alt, star azm')
             #print(star_alt,star_azm)
             if (str(star_alt)[1:2]) == ':': #The return value of the altitude of the star, when the Alt is below 10, is i.e. 8 and not 08. The code crashed beforehand due to "8:" not being an integer
                 if int(str(star_alt)[0:1]) > horizon_limit:
-                    RA_dec = RAconverter_HHtoDec(RA)
+                    RA_dec = RAconverter_HHtoDec(RA) #Converts the Hours to decimal 
                     print('RA in decimal is:')
-                    print(RA_dec)
+                    print(RA_dec) 
                     print('The target is above the horizon-limit of %i deg. The tracking will begin momentarily.'%(horizon_limit))
-                    track = requests.get(self.link+"mount/goto_ra_dec_j2000?ra_hours=%s&dec_degs=%s"%(RA.replace(":","%20"),DEC.replace(":","%20")))
+                    track = requests.get(self.link+"mount/goto_ra_dec_j2000?ra_hours=%s&dec_degs=%s"%(RA_dec,DEC.replace(":","%20")))
+                    print(track)
                     timeout_sec = 60 #number of seconds before timeout
                     timeout = time.time() + timeout_sec
                     time.sleep(3)   
@@ -1079,8 +1078,8 @@ class PWI4():
             False if there was a timeout 
         
         """
-        park_alt = 25 # the altitude in deg where the telescope will be parked 
-        park_azm = 180 # the azimuth in deg where the telescope will be parked
+        park_alt = conf.park_alt # the altitude in deg where the telescope will be parked 
+        park_azm = conf.park_azm # the azimuth in deg where the telescope will be parked
         print('The mount will be parked to the position %i\xb0, %i\xb0 (Alt,Azm)'%(park_alt,park_azm))
         park = requests.get(self.link+"mount/goto_alt_az?alt_degs=%s&az_degs=%s"%(park_alt,park_azm))
         timeout_sec = 60 #number of sec before timeout
@@ -1280,7 +1279,7 @@ class PWI4():
         star_init = SSCA.star_pos.__init__(self,site=3)
         star_alt = SSCA.star_pos.star_alt(self,RA,DEC)
         star_azm = SSCA.star_pos.star_az(self,RA,DEC)
-        horizon_limit = 15 #tracking limit. IF CHANGED HERE, THEN ALSO CHANGE IN PWI!!!!!
+        horizon_limit = conf.NOVO_lower_limit #tracking limit. IF CHANGED HERE, THEN ALSO CHANGE IN PWI!!!!!
         alt_degree,_,_ = str(star_alt).split(":")
         
         if int(alt_degree) > horizon_limit:
@@ -1335,7 +1334,7 @@ class PWI4():
             print('There was an error with the Alt/Azm format')
             print('The movement will NOT begin')
             return False
-        horizon_limit = 15 #degrees above the horizon where the telescope cannot track below. SHOULD BE CHANGE ALSO IN PWI2 and in MntMoveRaDec and MntMoveRaDecJ2000
+        horizon_limit = conf.NOVO_lower_limit #degrees above the horizon where the telescope cannot track below. SHOULD BE CHANGE ALSO IN PWI4 and in MntMoveRaDec and MntMoveRaDecJ2000
 #        if Alt > 90:
 #            print('The altitude must be lower than 90 deg. The mount will NOT be moved')
 #            return False
@@ -1391,11 +1390,11 @@ class PWI4():
     
     def LoadPointingModel(self,filename):
         """
-        This function loads in a pointing model from Documents/PlaneWave Instruments/PWI2/Mount/
+        This function loads in a pointing model from Documents/PlaneWave Instruments/PWI4/Mount/
         The filename has some restrictions:
             1. only alphanumeric characters, underscore and hyphen
             2. must end in ".pxp"
-            3. Must be in the path "Documents/PlaneWave Instruments/PWI2/Mount" on the computer
+            3. Must be in the path "Documents/PlaneWave Instruments/PWI4/Mount" on the computer
         Example of command:
             LoadPointingModel('Model1.pxp')
             
@@ -1412,7 +1411,7 @@ class PWI4():
             print('Error')
             print('The filetype must be .pxp!')
             return
-        cmd = requests.get(self.link+"?&device=mount&cmd=setmodel&filename=%s"%(filename))
+        cmd = requests.get(self.link+"mount/model/load?filename=%s"%(filename))
         time.sleep(2)
         self.update()
         if self.MNT_PointingModel == filename:
@@ -1469,7 +1468,7 @@ class PWI4():
         #At the moment (14/11/2019) DOES NOT WORK! Crashes the simulator, azm deg goes to 24000074 degs
     def startMntHoming(self):
         """
-        A function that starts the homing procedure in PWI2 for the mount. 
+        A function that starts the homing procedure in PWI4 for the mount. 
         *PLEASE NOTE*: Per version 0.0.1 this function crashes the simulator and
         has not been tested on a real telescope. It is therefor suggested to be very careful when
         using this function
@@ -1569,10 +1568,12 @@ class PWI4():
     def SavePointingModel(self,filename):
         """
         The function saves the current pointing model, using the name provided by the user. 
-        The pointing model is saved in "Docuements/PlaneWave Instruments/PWI2/Mount" on the local computer.
+        The pointing model is saved in "Docuements/PlaneWave Instruments/PWI4/Mount" on the local computer.
         The filename must be alphanumeric, but can also contain hyphen, "-", and underscore "_".
+        The filename must end in ".pxp".
+
     
-        Example of command: .SavePointingModel("Feb_model")
+        Example of command: .SavePointingModel("Feb_model.pxp")
         
         Args:
             The filename under which the pointing model is saved.
@@ -1580,7 +1581,18 @@ class PWI4():
             True when the pointing model is saved
             False if the filename is not alphanumeric.
         """
-        copy = filename
+        #Test for ending
+        try:
+            pxp = filename.split(".")
+            if pxp[1] != "pxp":
+                print('The filename needs to end with .pxp')
+                return False
+        except: 
+            print('The filename must contain a ".pxp"')
+            return False
+
+        #testing for alphanumeric name
+        copy = pxp[0]
         copy = copy.replace("-","")
         copy = copy.replace("_","")
         check = copy.isalnum()
@@ -1591,11 +1603,19 @@ class PWI4():
             print('The model will not be saved.')
             return False
         
-        print('The pointing model will be saved as %s.pxp momentarily - please wait.' %(filename))
-        cmd = requests.get(self.link+"?&device=mount&cmd=savemodel&filename=%s.pxp"%(filename))
-        print('Model saved. Location: Documents/PlaneWave Instruments/PWI2/Mount')
+        print('The pointing model will be saved as %s momentarily - please wait.' %(filename))
+        cmd = requests.get(self.link+"mount/model/save?filename=%s"%(filename))
+        time.sleep(1)
+        self.update()
+        time.sleep(1)
+        if self.MNT_PointingModel == "%s"%(filename):
+            print('Model saved. Location: Documents/PlaneWave Instruments/PWI4/Mount')
+            return True
+        else: 
+            print('The pointing model was not saved correctly')
+            return False
         
-        return True
+      
     
     
     def ClearPointingModel(self):
@@ -1723,12 +1743,12 @@ class PWI4():
         
         print('The rotator will start moving momentarily - please wait')
         
-        cmd = requests.get(self.link+"?&device=rotator&cmd=move&position=%i"%(position))
+        cmd = requests.get(self.link+"rotator/goto_field?degs=%i"%(position))
         time.sleep(2)
         self.update()
         timeout_sec = 180 #number of seconds before time-outting
         timeout = time.time() + timeout_sec
-        while self.ROT_moving == "True":
+        while self.ROT_moving == "true":
             self.update()
             print('The rotator is moving, current position is %s deg - please wait'%(self.ROT_position))
             time.sleep(5)
@@ -1866,7 +1886,7 @@ class PWI4():
             False if there is a timeout.
         """
         print('Enabling Alt-Azm field de-rotation - please wait')
-        cmd = requests.get(self.link+"?&device=rotator&cmd=derotatestart")
+        cmd = requests.get(self.link+"rotator/enable")
         timeout_sec = 10 #number of seconds before time-out
         timeout = time.time()+ timeout_sec
         self.update()
@@ -1890,7 +1910,7 @@ class PWI4():
             False if there is a timeout.
         """
         print('Disabling Alt-Azm field de-rotation - please wait')
-        cmd = requests.get(self.link+"?&device=rotator&cmd=derotatestop")
+        cmd = requests.get(self.link+"rotator/disable")
         timeout_sec = 10 #number of seconds before timing out
         timeout = time.time() + timeout_sec
         self.update()

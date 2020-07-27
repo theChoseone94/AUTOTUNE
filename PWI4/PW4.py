@@ -716,8 +716,7 @@ class PWI4():
 
     def DisconnectMNT(self):
         """
-        A function that disconnects the mount from PWI. The functions start by 
-        de-energizing the motors and then disconnect the mount. 
+        A function that disconnects the mount from PWI.
         
         Returns:
             True when disconnection is finished.
@@ -727,8 +726,8 @@ class PWI4():
         if self.MNT_connection == "false":
             print('The mount is already disconnected')
             return True
-        disableAzm = requests.get(self.link+"mount/disable?axis=0")
-        disableAlt = requests.get(self.link+"mount/disable?axis=1")
+        #disableAzm = requests.get(self.link+"mount/disable?axis=0")
+        #disableAlt = requests.get(self.link+"mount/disable?axis=1")
         time.sleep(2)
         cmd = requests.get(self.link+"mount/disconnect")
         self.update()
@@ -921,9 +920,8 @@ class PWI4():
         the target is then checked if it on the night sky with the Observer at Mount Kent, Queensland Australia .
         
         Per version 0.0.1:
-        The minimum elevation, called horizon_limit, above the horizon is set to 15 deg.
-        *PLEASE NOTE*: if the minimum elevation is to be changed, it needs to be changed both in here 
-        and in PWI under the variable "LOWER TRACKING LIMIT". 
+        The minimum elevation, called horizon_limit, above the horizon is set to 16 deg.
+        This is set in the config file "PWI4_config.py"
         
         If target is above the minimum elevation, the mount will move to the target and track the target.
         
@@ -971,15 +969,15 @@ class PWI4():
             #print(star_alt,star_azm)
             if (str(star_alt)[1:2]) == ':': #The return value of the altitude of the star, when the Alt is below 10, is i.e. 8 and not 08. The code crashed beforehand due to "8:" not being an integer
                 if int(str(star_alt)[0:1]) > horizon_limit:
-                    RA_dec = RAconverter_HHtoDec(RA) #Converts the Hours to decimal 
-                    print('RA in decimal is:')
-                    print(RA_dec) 
+                    Ra_dec = RAconverter_HHtoDec(RA)
+                    Dec_dec = HMS2deg(ra = "",dec ="%s"%(DEC))
                     print('The target is above the horizon-limit of %i deg. The tracking will begin momentarily.'%(horizon_limit))
-                    track = requests.get(self.link+"mount/goto_ra_dec_j2000?ra_hours=%s&dec_degs=%s"%(RA_dec,DEC.replace(":","%20")))
+                    track = requests.get(self.link+"mount/gotoradecj2000?ra_hours=%.4f&dec_degs=%.5f"%(float(Ra_dec[0]),float(Dec_dec)))
                     print(track)
                     timeout_sec = 60 #number of seconds before timeout
                     timeout = time.time() + timeout_sec
                     time.sleep(3)   
+                    self.update()
                     while self.MNT_slewing == "true":
                         print('Not on target yet, please wait') 
                         time.sleep(2)                   
@@ -996,14 +994,14 @@ class PWI4():
                 
             elif (str(star_alt)[2:3]) == ':':    
                 if int(str(star_alt)[0:2]) > horizon_limit:
-                    RA_dec = RAconverter_HHtoDec(RA)
-                    print('RA in decimal is:')
-                    print(RA_dec)
+                    Ra_dec = RAconverter_HHtoDec(RA)
+                    Dec_dec = HMS2deg(ra = "",dec ="%s"%(DEC))
                     print('The target is above the horizon-limit of %i deg. The tracking will begin momentarily.'%(horizon_limit))
-                    track = requests.get(self.link+"mount/goto_ra_dec_j2000?ra_hours=%s&dec_degs=%s"%(RA.replace(":","%20"),DEC.replace(':','%20')))
+                    track = requests.get(self.link+"mount/goto_ra_dec_j2000?ra_hours=%.4f&dec_degs=%.5f"%(float(Ra_dec[0]),float(Dec_dec)))
                     timeout_sec = 60 #number of seconds before timeout
                     timeout = time.time() + timeout_sec
                     time.sleep(3)   
+                    self.update()
                     while self.MNT_slewing == "true":
                         print('Not on target yet, please wait') 
                         time.sleep(2)                   
@@ -1268,6 +1266,8 @@ class PWI4():
         self.update()
         RA = self.RA
         DEC = self.DEC
+
+        print(RA,DEC)
         
         print('Moving mount - please wait')
         check = self.checkFormatRaDec(RA,DEC)
@@ -1276,16 +1276,20 @@ class PWI4():
             print('There is an error in the format of the RA/DEC. Tracking will NOT be started.')
             return False
         
-        star_init = SSCA.star_pos.__init__(self,site=3)
+        star_init = SSCA.star_pos.__init__(self,site=conf.site)
         star_alt = SSCA.star_pos.star_alt(self,RA,DEC)
         star_azm = SSCA.star_pos.star_az(self,RA,DEC)
-        horizon_limit = conf.NOVO_lower_limit #tracking limit. IF CHANGED HERE, THEN ALSO CHANGE IN PWI!!!!!
+        horizon_limit = conf.NOVO_lower_limit #tracking limit. 
         alt_degree,_,_ = str(star_alt).split(":")
+        print(alt_degree)
         
         if int(alt_degree) > horizon_limit:
             print('Target is above horizon limit of %i degrees'%(horizon_limit))
             print('The tracking will start momentarily - please wait')
-            cmd = requests.get(self.link+"mount/goto_ra_dec_apparent?ra_hours=%s&dec_degs=%s"%(RA.replace(":","%20"),DEC.replace(":","%20")))
+            Ra_dec = RAconverter_HHtoDec(RA)
+            Dec_dec = HMS2deg(ra = "",dec ="%s"%(DEC))
+            print(Ra_dec,Dec_dec)
+            cmd = requests.get(self.link+"mount/goto_ra_dec_apparent?ra_hours=%.5f&dec_degs=%.5f"%(float(Ra_dec[0]),float(Dec_dec)))
             timeout_sec = 60 #number of seconds before timing out
             timeout = time.time() + timeout_sec
             time.sleep(2)

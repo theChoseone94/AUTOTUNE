@@ -2,12 +2,12 @@
 
 
 # IP-address and port number for the telescope computer running PWI4
-NOVO_tel_com_ip = "10.22.88.66"
-NOVO_tel_com_port = 8220
+NOVO_tel_com_ip = "10.22.88.143"
+NOVO_tel_com_port = 8220 #must be int
 #the IP_address and port numbers for the daemon. There are two port numbers, one for each thread.
 NOVO_daemon_host = "localhost"
-NOVO_daemon_port1 = "8000"
-NOVO_daemon_port2 = "9000"
+NOVO_daemon_port1 = 8000 #Must be int
+NOVO_daemon_port2 = 9000 #Must be int
 
 # Directory of the saved logfile and the process-ID 
 NOVO_daemon_log = "/tmp/NOVO_daemon.log"

@@ -14,6 +14,8 @@ import getopt
 import xmlrpc.client  
 import PW4 as PW
 import _thread
+import PWI4_config as conf
+
 
 
 class RequestHandler(SimpleXMLRPCRequestHandler):
@@ -51,7 +53,7 @@ class commander(Daemon):
          
        ### server handling all other functions than stop functions.
         try:
-            server = SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler, logRequests=False,allow_none=True)
+            server = SimpleXMLRPCServer((conf.NOVO_daemon_host, conf.NOVO_daemon_port1), requestHandler=RequestHandler, logRequests=False,allow_none=True)
             server.allow_reuse_address = True
         except Exception as e:
             print('error: ',e)
@@ -59,7 +61,7 @@ class commander(Daemon):
             
         ### server handling the stop functions. This is to being able to send stop commands while the "while-loops" are running.
         try:
-            server2 = SimpleXMLRPCServer(("localhost", 9000),requestHandler=RequestHandler,logRequests=False,allow_none=True)
+            server2 = SimpleXMLRPCServer((conf.NOVO_daemon_host, conf.NOVO_daemon_port2),requestHandler=RequestHandler,logRequests=False,allow_none=True)
             server2.allow_reuse_address = True
         except Exception as e:
             print('error:',e)
@@ -80,7 +82,6 @@ class commander(Daemon):
         def ConnectMNT():
             cmd = PWI.ConnectMNT()
             return cmd
-        
         
         def ConnectFOC():
             cmd = PWI.ConnectFOC()
@@ -114,10 +115,6 @@ class commander(Daemon):
             cmd = PWI.MntMoveRaDecJ2000()
             return cmd
         
-        def getUTC():
-            reply = PWI.getUTC()
-            return reply
-        
         def update():
             reply = PWI.update()
             return reply
@@ -133,10 +130,7 @@ class commander(Daemon):
         def getDEC2000():
             reply = PWI.getDEC2000()
             return reply
-        
-        def getJD():
-            reply = PWI.getJD()
-            return reply
+    
         
         def getFocuserPos():
             reply = PWI.getFocuserPos()
@@ -170,33 +164,12 @@ class commander(Daemon):
             reply = PWI.MoveFocuserPos(position)
             return reply
         
-        def MoveFocuserInc(Inc):
-            reply = PWI.MoveFocuserInc(Inc)
-            return reply 
-        
-        #DOES NOT WORK YET!
         def FocSTOP():
             reply = PWI.FocSTOP()
             return reply
         
-        def FocFindHome():
-            reply = PWI.FocFindHome()
-            return reply
-        
-        def FocAutofocus():
-            PWI.FocAutofocus()
-            return
-        
-        def AZM_motor_error():
-            PWI.AZM_motor_error()
-            return
-        
-        def ALT_motor_error():
-            PWI.ALT_motor_error()
-            return
-        
-        def MntResetMotors():
-            reply = PWI.MntResetMotors()
+        def MntMotorReset():
+            reply = PWI.MntMotorReset()
             return reply 
         
         def checkFormatRaDec(Ra,Dec):
@@ -235,14 +208,6 @@ class commander(Daemon):
             reply = PWI.MntMotorDisable()
             return reply
         
-        def MntMoveIncRaDec(Ra,Dec):
-            reply = PWI.MntMoveIncRaDec(Ra,Dec)
-            return reply 
-        
-        def MntMoveIncAltAzm(Alt,Azm):
-            reply = PWI.MntMoveIncAltAzm(Alt,Azm)
-            return reply
-        
         def MntMoveRaDec():
             reply = PWI.MntMoveRaDec()
             return reply 
@@ -258,31 +223,14 @@ class commander(Daemon):
         def LoadPointingModel(filename):
             reply = PWI.LoadPointingModel(filename)
             return reply
-        
-        #Needs more work!
-        def setTrackingRates(RaRate,DecRate):
-            PWI.setTrackingRates(RaRate,DecRate)
-            return
-        
-        #Does not work yet - is a catapult function currently
-        def JogAltAzm(Alt,Azm):
-            PWI.JogAltAzm(Alt,Azm)
-            return
-        
-        #Does not work - crashes motor and points to -78 deg Alt
-        #Need to send input
-        def SyncMountCoorJ2000(RA,DEC):
-            PWI.SyncMountCoorJ2000(RA,DEC)
-            return
-        
+              
         def AddPointToModel(Ra,Dec):
-            PWI.AddPointToModel(Ra,Dec)
-            return
+            cmd = PWI.AddPointToModel(Ra,Dec)
+            return cmd
         
-        #Problem: Doesn't save anything at the moment: 28/11/2019
         def SavePointingModel(filename):
-            PWI.SavePointingModel(filename)
-            return
+            cmd = PWI.SavePointingModel(filename)
+            return cmd
         
         def ClearPointingModel():
             reply = PWI.ClearPointingModel()
@@ -304,10 +252,6 @@ class commander(Daemon):
             reply = PWI.RotSTOP()
             return reply
         
-        def Rot_StartHoming():
-            reply = PWI.Rot_StartHoming()
-            return reply
-        
         def Rot_derotateStart():
             reply = PWI.Rot_derotateStart()
             return reply
@@ -315,10 +259,7 @@ class commander(Daemon):
         def Rot_derotateStop():
             reply = PWI.Rot_derotateStop()
             return reply
-        
-        def Rot_MoveInc(deg):
-            reply = PWI.Rot_MoveInc(deg)
-            return reply
+
         def getTrackingRMSError():
             reply = PWI.getTrackingRMSError()
             return reply
@@ -343,12 +284,10 @@ class commander(Daemon):
         server.register_function(Initialize)
         server.register_function(getStatus)
         server.register_function(MntMoveRaDecJ2000)
-        server.register_function(getUTC)
         server.register_function(update)
         server.register_function(getALL)
         server.register_function(getRA2000)
         server.register_function(getDEC2000)
-        server.register_function(getJD)
         server.register_function(getFocuserPos)
         server.register_function(getMNT_CONNECT)
         server.register_function(getFOC_CONNECT)
@@ -356,12 +295,7 @@ class commander(Daemon):
         server.register_function(getIsTrackingOn)
         server.register_function(getTemps)
         server.register_function(MoveFocuserPos)
-        server.register_function(MoveFocuserInc)
-        server.register_function(FocFindHome)
-        server.register_function(FocAutofocus)
-        server.register_function(AZM_motor_error)
-        server.register_function(ALT_motor_error)
-        server.register_function(MntResetMotors)
+        server.register_function(MntMotorReset)
         server.register_function(checkFormatRaDec)
         server.register_function(checkFormatAltAzm)
         server.register_function(checkFormatArcsec)
@@ -369,24 +303,18 @@ class commander(Daemon):
         server.register_function(parkMount)
         server.register_function(MntMotorEnable)
         server.register_function(MntMotorDisable)
-        server.register_function(MntMoveIncRaDec)
-        server.register_function(MntMoveIncAltAzm)
         server.register_function(MntMoveRaDec)
         server.register_function(MntMoveAltAzm)
         server.register_function(startTracking)
         server.register_function(LoadPointingModel)
-        server.register_function(setTrackingRates)
-        server.register_function(JogAltAzm)
-        server.register_function(SyncMountCoorJ2000)
         server.register_function(AddPointToModel)
         server.register_function(SavePointingModel)
+        server.register_function(ClearPointingModel)
         server.register_function(FansON)
         server.register_function(FansOFF)
         server.register_function(Rot_Move)
         server.register_function(Rot_derotateStart)
         server.register_function(Rot_derotateStop)
-        server.register_function(Rot_StartHoming)
-        server.register_function(Rot_MoveInc)
         server.register_function(setTargetRaDecJ2000)
         server.register_function(setTargetAltAzm)
         server.register_function(setTargetRaDec)
@@ -394,7 +322,7 @@ class commander(Daemon):
         server.register_function(getRotatorDerotate)
         server.register_function(getTrackingRMSError)
         server.register_function(startMntHoming)
-        server.register_function(ClearPointingModel)
+
         
         server.register_function(stop_server)
         
@@ -422,7 +350,7 @@ def main():
       The daemon is started in /tmp/ as "daemon.pid" and the output from the daemon is stored in the Dropbox account. 
       This is mostly relevant under my stay in Australia - THIS SHOULD BE CHANGED AFTER THE STAY. 
    """
-   daemon = commander("/tmp/daemon.pid", stdout="/tmp/daemon.log", stderr="/tmp/daemon.log")
+   daemon = commander(conf.NOVO_daemon_pid, stdout=conf.NOVO_daemon_log, stderr=conf.NOVO_daemon_log)
    try:
       opts, list = getopt.getopt(sys.argv[1:], 'sth')
    except (getopt.GetoptError):
@@ -432,7 +360,7 @@ def main():
    for opt, a in opts:
       if opt == "-s":
          try:
-            pid_number = open("/tmp/daemon.pid",'r').readline()
+            pid_number = open(conf.NOVO_daemon_pid,'r').readline()
             if pid_number:
                sys.exit('Daemon is already running!')
          except (Exception):
@@ -441,7 +369,7 @@ def main():
          daemon.start()
          print('This is after the daemon starting')
       elif opt == "-t":
-          server = xmlrpc.client.ServerProxy('http://'+str('localhost')+':'+str(8000))
+          server = xmlrpc.client.ServerProxy('http://'+str(conf.NOVO_daemon_host)+':'+str(conf.NOVO_daemon_port1))
           print('Stopping Daemon...')
           server.stop_server()
 	 # Hmm, calling stop_server() directly would properly work just fine. 

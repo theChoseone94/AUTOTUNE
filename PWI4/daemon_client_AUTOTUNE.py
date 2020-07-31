@@ -7,6 +7,8 @@ import xmlrpc.client
 import sys
 from optparse import OptionParser
 import time
+import PWI4_config as conf
+
 
 """
 This program is for handling the client side of the daemon. 
@@ -29,10 +31,12 @@ parser = OptionParser()
 parser.add_option("-c", "--command", dest="command", default="restart", help="")                                                                           
 (options, args) = parser.parse_args()
 
-#attempt connection to server
-conn = xmlrpc.client.ServerProxy('http://localhost:8000/')
 
-conn2 = xmlrpc.client.ServerProxy('http://localhost:9000/')
+
+#attempt connection to server
+conn = xmlrpc.client.ServerProxy('http://%s:%i/'%(conf.NOVO_daemon_host,conf.NOVO_daemon_port1))
+
+conn2 = xmlrpc.client.ServerProxy('http://%s:%i/'%(conf.NOVO_daemon_host,conf.NOVO_daemon_port2))
 
 #Functions for the client side to call the server, which again calls PW_Class
 
@@ -100,7 +104,6 @@ def parkMount():
     else: 
         print(reply)
     
-    
 def getStatus():
     try: 
         reply = conn.getStatus()
@@ -129,22 +132,6 @@ def DisconnectFOC():
 def Initialize():
     try:
         reply = conn.Initialize()
-    except Exception as e:
-        print(e)
-    else: 
-        print(reply)
-
-def getUTC():
-    try:
-        reply = conn.getUTC()
-    except Exception as e:
-        print(e)
-    else: 
-        print(reply)
-        
-def getJD():
-    try:
-        reply = conn.getJD()
     except Exception as e:
         print(e)
     else: 
@@ -198,7 +185,6 @@ def update():
     else: 
         print(reply)
 
-# DOES NOT WORK???!?!?
 def getIsTrackingOn():
     try:
         reply = conn.getIsTrackingOn()
@@ -239,7 +225,6 @@ def setTargetRaDec(Ra,Dec):
     else:
         print(reply)
 
-  
 def FansON():
     try:
         reply = conn.FansON()
@@ -257,9 +242,9 @@ def FansOFF():
         print(reply)
         
         
-def MntResetMotors():
+def MntMotorReset():
     try:
-        reply = conn.MntResetMotors()
+        reply = conn.MntMotorReset()
     except Exception as e:
         print(e)
     else: 
@@ -312,8 +297,7 @@ def stopTracking():
     except Exception as e:
         print(e)
     else:
-        print(reply)
-           
+        print(reply)   
         
 def getALL():
     try: 
@@ -338,53 +322,10 @@ def getTemps():
         print(e)
     else:
         print(reply)
-        
-
-
-def MoveFocuserInc(inc):
-    try: 
-        reply = conn.MoveFocuserInc(inc)
-        
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
 
 def getFocuserPos():
     try:
         reply = conn.getFocuserPos()
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-        
-def FocFindHome():
-    try:
-        reply = conn.FocFindHome()
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-
-def FocAutoFocus():
-    try: 
-        reply = conn.FocAutoFocus()
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-
-def ALT_motor_error():
-    try:
-        reply = conn.ALT_motor_error()
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-        
-def AZM_motor_error():
-    try: 
-        reply = conn.AZM_motor_error()
     except Exception as e:
         print(e)
     else:
@@ -412,23 +353,7 @@ def checkFormatArcsec(Arcsec):
     except Exception as e:
         print(e)
     else:
-        print(reply)
-        
-def MntMoveIncRaDec(Ra,Dec):
-    try:
-        reply = conn.MntMoveIncRaDec(Ra,Dec)
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-
-def MntMoveIncAltAzm(Alt,Azm):
-    try:
-        reply = conn.MntMoveIncRaDec(Alt,Azm)
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)        
+        print(reply)      
 
 def MntMoveRaDec():
     try:
@@ -503,15 +428,6 @@ def Rot_Move(position):
     else:
         print(reply)
         
-        
-def Rot_StartHoming():
-    try:
-        reply = conn.Rot_StartHoming()
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-        
 def Rot_derotateStart():
     try:
         reply = conn.Rot_derotateStart()
@@ -526,44 +442,4 @@ def Rot_derotateStop():
     except Exception as e:
         print(e)
     else:
-        print(reply)
-
-
-def Rot_MoveInc(deg):
-    try:
-        reply = conn.Rot_MoveInc(deg)
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-
-def SyncMountCoorJ2000(Ra,Dec):
-    try: 
-        reply = conn.SyncMountCoorJ2000(Ra,Dec)
-    except Exception as e:
-        print(e)
-    else: 
-        print(reply)
-
-
-    #NOT WORKING PROPERLY PLEASE DONT USE THIS FUNCTION!!
-def setTrackingRates(RaRate,DecRate):
-    try:
-        reply = conn.setTrackingRates(RaRate,DecRate)
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-
-    #NOT WORKING PROPERLY PLEASE DONT USE THIS FUNCTION!!
-def JogAltAzm(Alt,Azm):
-    try:
-        reply = conn.JogAltAzm(Alt,Azm)
-    except Exception as e:
-        print(e)
-    else:
-        print(reply)
-        
-        
-        
-        
+        print(reply)        

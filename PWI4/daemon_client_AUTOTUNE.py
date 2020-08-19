@@ -64,7 +64,7 @@ def RotSTOP():
         print(e)
     else:
         print(reply)
-#####
+###############################################
 
 ##### All other commands for operating the telescope.
 def StopServerConnection():

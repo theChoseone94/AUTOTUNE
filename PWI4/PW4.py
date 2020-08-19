@@ -1540,6 +1540,8 @@ class PWI4():
                 print('The session has timed out after %i seconds'%(timeout_sec))
                 return False
         print('The point at %s, %s (RA,DEC) has been added to the current pointing model'%(RA,DEC))
+        self.update()
+        print('There are now %s points in the pointing model'%(self.MNT_PointingModelPoints))
         return True
     
 

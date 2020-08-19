@@ -2,7 +2,7 @@
 
 
 # IP-address and port number for the telescope computer running PWI4
-NOVO_tel_com_ip = "10.22.88.225" #IP-address for computer running PWI4
+NOVO_tel_com_ip = "10.22.88.234" #IP-address for computer running PWI4
 NOVO_tel_com_port = 8220 #must be int
 
 #the IP_address and port numbers for the daemon. There are two port numbers, one for each thread.

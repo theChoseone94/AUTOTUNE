@@ -1572,6 +1572,8 @@ class PWI4():
                 print(&#39;The session has timed out after %i seconds&#39;%(timeout_sec))
                 return False
         print(&#39;The point at %s, %s (RA,DEC) has been added to the current pointing model&#39;%(RA,DEC))
+        self.update()
+        print(&#39;There are now %s points in the pointing model&#39;%(self.MNT_PointingModelPoints))
         return True
     
 
@@ -3703,6 +3705,8 @@ It also defines names for the variables from PWI4, which are stored in self. </p
                 print(&#39;The session has timed out after %i seconds&#39;%(timeout_sec))
                 return False
         print(&#39;The point at %s, %s (RA,DEC) has been added to the current pointing model&#39;%(RA,DEC))
+        self.update()
+        print(&#39;There are now %s points in the pointing model&#39;%(self.MNT_PointingModelPoints))
         return True
     
 
@@ -4248,6 +4252,8 @@ AddPointToModel("04:35:55.33","16:30:29.5") #Aldebaran's J2000.0 coordinates.</p
             print(&#39;The session has timed out after %i seconds&#39;%(timeout_sec))
             return False
     print(&#39;The point at %s, %s (RA,DEC) has been added to the current pointing model&#39;%(RA,DEC))
+    self.update()
+    print(&#39;There are now %s points in the pointing model&#39;%(self.MNT_PointingModelPoints))
     return True</code></pre>
 </details>
 </dd>

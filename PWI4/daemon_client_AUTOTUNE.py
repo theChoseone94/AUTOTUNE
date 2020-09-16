@@ -47,7 +47,7 @@ def MountSTOP():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def FocSTOP():
     try:
@@ -55,7 +55,7 @@ def FocSTOP():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def RotSTOP():
     try:
@@ -63,7 +63,7 @@ def RotSTOP():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 ###############################################
 
 ##### All other commands for operating the telescope.
@@ -74,7 +74,7 @@ def StopServerConnection():
 		print('Could not connect to the server!')
 		print(e)
 	else:
-		print(reply)
+		return reply
 
 
 def ConnectMNT():
@@ -84,7 +84,7 @@ def ConnectMNT():
         print('Could not connect mount')
         print(e)
     else:
-        print(reply)
+        return reply
 
 def ConnectFOC():
     try: 
@@ -93,7 +93,7 @@ def ConnectFOC():
         print('Could not connect mount')
         print(e)
     else:
-        print(reply)
+        return reply
         
         
 def parkMount():
@@ -102,7 +102,7 @@ def parkMount():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
     
 def getStatus():
     try: 
@@ -110,7 +110,7 @@ def getStatus():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
         
 def DisconnectMNT():
     try:
@@ -118,7 +118,7 @@ def DisconnectMNT():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
         
 def DisconnectFOC():
     try:
@@ -126,7 +126,7 @@ def DisconnectFOC():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
         
         
 def Initialize():
@@ -135,7 +135,7 @@ def Initialize():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
         
 def getRA2000():
     try:
@@ -143,7 +143,7 @@ def getRA2000():
     except Exception as e:
         print(e)
     else: 
-        print(reply)    
+        return reply    
 
 def getDEC2000():
     try:
@@ -151,7 +151,7 @@ def getDEC2000():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def getMNT_CONNECT():
     try:
@@ -159,7 +159,7 @@ def getMNT_CONNECT():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def getFOC_CONNECT():
     try:
@@ -167,7 +167,7 @@ def getFOC_CONNECT():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def getROT_CONNECT():
     try:
@@ -175,7 +175,7 @@ def getROT_CONNECT():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def update():
     try:
@@ -183,7 +183,7 @@ def update():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def getIsTrackingOn():
     try:
@@ -191,7 +191,7 @@ def getIsTrackingOn():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def startTracking():
     try:
@@ -199,7 +199,7 @@ def startTracking():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def setTargetRaDecJ2000(RA,DEC):
     try:
@@ -207,7 +207,7 @@ def setTargetRaDecJ2000(RA,DEC):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def setTargetAltAzm(Alt,Azm):
     try:
@@ -215,7 +215,7 @@ def setTargetAltAzm(Alt,Azm):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def setTargetRaDec(Ra,Dec):
     try:
@@ -223,7 +223,7 @@ def setTargetRaDec(Ra,Dec):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def FansON():
     try:
@@ -231,7 +231,7 @@ def FansON():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def FansOFF():
     try:
@@ -239,7 +239,7 @@ def FansOFF():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
         
         
 def MntMotorReset():
@@ -248,7 +248,7 @@ def MntMotorReset():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
         
 def MntMotorEnable():
     try:
@@ -256,7 +256,7 @@ def MntMotorEnable():
     except Exception as e:
         print(e)
     else: 
-        print(reply)        
+        return reply        
         
 def MntMotorDisable():
     try:
@@ -264,7 +264,7 @@ def MntMotorDisable():
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
 
 def startMntHoming():
     try:
@@ -272,7 +272,7 @@ def startMntHoming():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def MoveFocuserPos(position):
     try:
@@ -280,7 +280,7 @@ def MoveFocuserPos(position):
     except Exception as e:
         print(e)
     else: 
-        print(reply)
+        return reply
     return
 
 def MntMoveRaDecJ2000():
@@ -289,7 +289,7 @@ def MntMoveRaDecJ2000():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def stopTracking():
     try:
@@ -297,7 +297,7 @@ def stopTracking():
     except Exception as e:
         print(e)
     else:
-        print(reply)   
+        return reply   
         
 def getALL():
     try: 
@@ -305,7 +305,7 @@ def getALL():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def getTrackingRMSError():
     try:
@@ -313,7 +313,7 @@ def getTrackingRMSError():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def getTemps():
     try:
@@ -321,7 +321,7 @@ def getTemps():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def getFocuserPos():
     try:
@@ -329,7 +329,7 @@ def getFocuserPos():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def checkFormatRaDec(Ra,Dec):
     try:
@@ -337,7 +337,7 @@ def checkFormatRaDec(Ra,Dec):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def checkFormatAltAzm(Alt,Azm):
     try:
@@ -345,7 +345,7 @@ def checkFormatAltAzm(Alt,Azm):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def checkFormatArcsec(Arcsec):
     try:
@@ -353,7 +353,7 @@ def checkFormatArcsec(Arcsec):
     except Exception as e:
         print(e)
     else:
-        print(reply)      
+        return reply      
 
 def MntMoveRaDec():
     try:
@@ -361,7 +361,7 @@ def MntMoveRaDec():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def MntMoveAltAzm():
     try:
@@ -369,7 +369,7 @@ def MntMoveAltAzm():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 
 def LoadPointingModel(filename):
@@ -378,7 +378,7 @@ def LoadPointingModel(filename):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def AddPointToModel(Ra,Dec):
     try:
@@ -386,7 +386,7 @@ def AddPointToModel(Ra,Dec):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def SavePointingModel(filename):
     try:
@@ -394,7 +394,7 @@ def SavePointingModel(filename):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def ClearPointingModel():
     try:
@@ -402,7 +402,7 @@ def ClearPointingModel():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def getRotatorPos():
     try:
@@ -410,7 +410,7 @@ def getRotatorPos():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def getRotatorDerotate():
     try:
@@ -418,7 +418,7 @@ def getRotatorDerotate():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def Rot_Move(position):
     try:
@@ -426,7 +426,7 @@ def Rot_Move(position):
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
         
 def Rot_derotateStart():
     try:
@@ -434,7 +434,7 @@ def Rot_derotateStart():
     except Exception as e:
         print(e)
     else:
-        print(reply)
+        return reply
 
 def Rot_derotateStop():
     try:
@@ -442,4 +442,4 @@ def Rot_derotateStop():
     except Exception as e:
         print(e)
     else:
-        print(reply)        
+        return reply        

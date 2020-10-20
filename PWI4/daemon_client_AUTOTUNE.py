@@ -305,7 +305,7 @@ def getALL():
     except Exception as e:
         print(e)
     else:
-        return reply
+        return {x.split("=")[0]:x.split("=")[1] for x in reply.split("\n")[:-1]}
 
 def getTrackingRMSError():
     try:

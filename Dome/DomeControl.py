@@ -64,7 +64,7 @@ class astrohaven:
     def load_config(self):
 		#create configuration file object
         try:
-            config = ConfigObj(self.base_directory+self.config_file)
+            config = ConfigObj(self.config_file)
             self.port = config['Setup']['PORT']
             self.baudrate = config['Setup']['BAUDRATE']
             self.logger_name = config['Setup']['LOGNAME']
@@ -251,9 +251,9 @@ class astrohaven:
 							
 if __name__ == '__main__':
         #We need to change this around once we move this code to the server.
-        if socket.gethostname() == 'thechosenone': base_directory = '/home/hasse/Dropbox/Speciale/'
-        else: base_directory = '/home/hasse/Dropbox/Speciale/'
-        dome = astrohaven('DomeConfig.ini',base_directory)
+        #if socket.gethostname() == 'thechosenone': base_directory = '/home/hasse/Dropbox/Speciale/'
+        #else: base_directory = '/home/hasse/Dropbox/Speciale/'
+        dome = astrohaven('DomeConfig.ini',"~/Dokumenter/projects/AUTOTUNE/Dome/")
 	# while True:
 		# print dome.logger_name + ' test program'
 		# print ' a. open shutter 1'
